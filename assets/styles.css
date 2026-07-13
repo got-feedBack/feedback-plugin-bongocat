@@ -2127,3 +2127,97 @@
     opacity: 0.3;
   }
 }
+
+/* ── v7 tester feedback: global scale-up (~15%), bigger cat ──────────────
+   The cat box is sized in cqw (stage width, not viewport) so it scales with
+   the actual game surface; max-height:100% + object-fit:contain on both
+   sprite layers still clamps it inside the cat zone, so squat aspect ratios
+   (short hosts) can never push the cat past the strip or clip it. */
+
+/* HUD chips */
+.bc-game-root__stage-hud .bc-game-root__hud-lives-wrap {
+  font-size: 16px;
+  padding: 6px 12px;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-streak-wrap {
+  font-size: 16px;
+  padding: 6px 16px;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-score-wrap {
+  font-size: 16px;
+  padding: 6px 14px;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-phase-wrap,
+.bc-game-root__stage-hud .bc-game-root__hud-bpm-wrap {
+  font-size: 14px;
+  padding: 6px 14px;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-label {
+  font-size: 10px;
+}
+
+/* Notation strip */
+.bc-game-root__notation-bar {
+  min-height: 60px;
+  padding: 9px 12px 7px;
+}
+.bc-game-root__notation-figure {
+  height: 44px;
+}
+.bc-game-root__notation-slot {
+  min-width: 40px;
+}
+.bc-game-root__notation-runline {
+  font-size: 11px;
+}
+.bc-game-root__grade {
+  font-size: 9px;
+  padding: 2px 7px;
+}
+.bc-game-root__grade small {
+  font-size: 8px;
+}
+
+/* Cat — the star. Percentage units (stage-relative via the full-width cat
+   zone) instead of cqw: the host webview may lack container-query units,
+   and an invalid declaration would silently fall back to the old 260px cap.
+   The box height is clamped by the zone, so the square sprite canvas is
+   height-limited on 16:9 — width alone can't grow the art. The scale
+   transform reclaims the canvas's transparent bottom margin (~10%) and the
+   unused headroom, from the bottom-center so both stacked layers (cat +
+   instrument) stay pixel-registered and the zone's overflow:hidden crops
+   any excess on extreme aspect ratios. */
+.bc-game-root__cat {
+  width: min(50%, 520px);
+  transform: translateY(30%);
+  transform-origin: bottom center;
+}
+
+/* The legacy cat-demo padding (20px) pulled the clip line above the stage
+   bottom, cutting the instrument early. Zero it and let the inner wrappers
+   overflow — the stage's own overflow:hidden is the real boundary. */
+.bc-game-root__stage .bc-game-root__cat-demo {
+  padding: 0;
+}
+.bc-game-root__stage-cat,
+.bc-game-root__cat-zone {
+  overflow: visible;
+}
+
+/* Let the cat + instrument overspill the stage bottom: the root and stage
+   both clipped (overflow:hidden). Notation paging keeps its own clip on
+   .bc-game-root__notation-viewport, so releasing these is safe. */
+.bc-game-root,
+.bc-game-root__stage {
+  overflow: visible;
+}
+
+/* Phase cue scales with the stage too (px fallback first, cqw override
+   where supported) */
+.bc-game-root__cat-demo-label {
+  font-size: 26px;
+  font-size: clamp(22px, 3.2cqw, 32px);
+}
+.bc-game-root__cat-demo-beat-count {
+  font-size: 12px;
+}
