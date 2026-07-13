@@ -1,0 +1,2129 @@
+/* ============================================================
+   Bongo Cat's Rhythm Trainer — scoped under .bc-game-root
+   ============================================================ */
+
+/* Import BPM animation keyframes (task 5.2) */
+@import url("../src/bpm-motion.css");
+
+/* --- Root element reset + Design System tokens (E5S1) --- */
+.bc-game-root {
+  /* ---- Design System ----
+     Sticker Arcade visual language tokens.
+     Reference these via var() instead of hardcoded values. */
+
+  /* Color tokens — Light mode (default) */
+  --bc-bg: #E8F4FC;
+  --bc-surface: #FDFEFF;
+  --bc-border: #E2E8F0;
+  --bc-ink: #1E3A52;
+  --bc-primary: #0EA5E9;
+  --bc-secondary: #D194B8;
+  --bc-perfect: #3FA97E;
+  --bc-good: #7C89E0;
+  --bc-late: #D8A03E;
+  --bc-miss: #CC6E82;
+  --bc-hearts: #E08CA4;
+  --bc-streak: #38BDF8;
+  --bc-streak-grad: linear-gradient(90deg, #38BDF8, #B9A6E0);
+
+  /* Sticker rim tokens */
+  --bc-sticker-rim-color: #F8FAFC;
+  --bc-sticker-rim-width: 4px;
+
+  /* Shadow tokens */
+  --bc-shadow-offset-x: 5px;
+  --bc-shadow-offset-y: 6px;
+  --bc-shadow-color: rgba(0, 0, 0, 0.45);
+  --bc-shadow-btn-offset-x: 3px;
+  --bc-shadow-btn-offset-y: 4px;
+  --bc-shadow-btn-color: rgba(0, 0, 0, 0.3);
+
+  /* Corner radii */
+  --bc-panel-radius: 18px;
+  --bc-chip-radius: 999px;
+  --bc-notation-slot-radius: 12px;
+  --bc-setup-control-radius: 12px;
+
+  /* Spacing */
+  --bc-panel-gap: 12px;
+  --bc-panel-padding: 16px;
+
+  /* Sticker rotation (small offset for hand-placed feel) */
+  --bc-panel-rotation: 0.5deg;
+
+  /* Typography */
+  --bc-font-family: "Averia Libre", ui-rounded, system-ui, sans-serif;
+  --bc-font-mono: ui-monospace, "SF Mono", "Fira Code", "Consolas", monospace;
+
+  /* Base layout */
+  display: block;
+  box-sizing: border-box;
+  font-family: var(--bc-font-family);
+  line-height: 1.4;
+  color: var(--bc-ink);
+  background: var(--bc-bg);
+
+  /* Responsive: 16:9 gameplay area awareness */
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+/* --- Dark Mode --- */
+@media (prefers-color-scheme: dark) {
+  .bc-game-root {
+    --bc-bg: #0F172A;
+    --bc-surface: #1E293B;
+    --bc-border: #334155;
+    --bc-ink: #F8FAFC;
+    --bc-primary: #38BDF8;
+    --bc-secondary: #E0A9CB;
+    --bc-perfect: #6FC9A2;
+    --bc-good: #9BA8F0;
+    --bc-late: #E7B95F;
+    --bc-miss: #E092A4;
+    --bc-hearts: #EBA6BC;
+    --bc-streak: #7DD3FC;
+    --bc-streak-grad: linear-gradient(90deg, #7DD3FC, #C3B1EC);
+    --bc-sticker-rim-color: #1E293B;
+    --bc-shadow-color: rgba(0, 0, 0, 0.6);
+    --bc-shadow-btn-color: rgba(0, 0, 0, 0.45);
+  }
+}
+
+.bc-game-root *,
+.bc-game-root *::before,
+.bc-game-root *::after {
+  box-sizing: inherit;
+}
+
+/* ============================================================
+   Typography Utility Classes (E5S1)
+   ============================================================ */
+
+.bc-display {
+  font: 700 24px/1.2 var(--bc-font-family);
+}
+
+.bc-display-sm {
+  font: 700 20px/1.2 var(--bc-font-family);
+}
+
+.bc-body {
+  font: 400 13px/1.4 var(--bc-font-family);
+}
+
+.bc-label {
+  font: 700 11px/1 var(--bc-font-family);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bc-grade {
+  font: 800 10px/1.4 var(--bc-font-family);
+}
+
+.bc-mono {
+  font: 400 10px/1.4 var(--bc-font-mono);
+}
+
+/* ============================================================
+   Sticker Panel Base Class (E5S1)
+   ============================================================ */
+
+.bc-sticker-panel {
+  background: var(--bc-surface);
+  border: var(--bc-sticker-rim-width) solid var(--bc-sticker-rim-color);
+  border-radius: var(--bc-panel-radius);
+  box-shadow: var(--bc-shadow-offset-x) var(--bc-shadow-offset-y) 0 var(--bc-shadow-color);
+  transform: rotate(var(--bc-panel-rotation));
+  padding: var(--bc-panel-padding);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* ============================================================
+   Button Classes (E5S1)
+   ============================================================ */
+
+.bc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 24px;
+  border: var(--bc-sticker-rim-width) solid var(--bc-sticker-rim-color);
+  border-radius: var(--bc-setup-control-radius);
+  font: 700 15px/1.2 var(--bc-font-family);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+  text-align: center;
+  line-height: 1.2;
+  user-select: none;
+}
+
+.bc-btn:focus-visible {
+  outline: 3px solid var(--bc-primary);
+  outline-offset: 2px;
+}
+
+.bc-btn:active {
+  transform: translateY(1px);
+}
+
+.bc-btn--primary {
+  background: var(--bc-primary);
+  color: var(--bc-ink);
+  box-shadow: var(--bc-shadow-btn-offset-x) var(--bc-shadow-btn-offset-y) 0 var(--bc-shadow-btn-color);
+}
+
+.bc-btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: calc(var(--bc-shadow-btn-offset-x) + 1px) calc(var(--bc-shadow-btn-offset-y) + 1px) 0 var(--bc-shadow-btn-color);
+}
+
+.bc-btn--primary:active {
+  box-shadow: 1px 2px 0 var(--bc-shadow-btn-color);
+}
+
+.bc-btn--secondary {
+  background: var(--bc-surface);
+  color: var(--bc-ink);
+  box-shadow: var(--bc-shadow-btn-offset-x) var(--bc-shadow-btn-offset-y) 0 rgba(0, 0, 0, 0.2);
+}
+
+.bc-btn--secondary:hover {
+  transform: translateY(-1px);
+}
+
+.bc-btn--secondary:active {
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.bc-btn--ghost {
+  background: transparent;
+  color: var(--bc-ink);
+  border-color: transparent;
+}
+
+.bc-btn--disabled,
+.bc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none !important;
+}
+
+/* ============================================================
+   Segmented Control Classes (E5S1)
+   ============================================================ */
+
+.bc-segmented {
+  display: flex;
+  gap: 0;
+  border: 2px solid var(--bc-border);
+  border-radius: var(--bc-setup-control-radius);
+  overflow: hidden;
+}
+
+.bc-segmented-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: var(--bc-surface);
+  color: var(--bc-ink);
+  font: 500 13px/1 var(--bc-font-family);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  outline: none;
+}
+
+.bc-segmented-btn + .bc-segmented-btn {
+  border-left: 1px solid var(--bc-border);
+}
+
+.bc-segmented-btn--active {
+  background: var(--bc-primary);
+  color: var(--bc-ink);
+  font-weight: 700;
+}
+
+.bc-segmented-btn:focus-visible {
+  outline: 3px solid var(--bc-primary);
+  outline-offset: -3px;
+  z-index: 1;
+}
+
+.bc-segmented-btn:hover:not(.bc-segmented-btn--active):not(:disabled) {
+  background: var(--bc-bg);
+}
+
+.bc-segmented-btn--disabled,
+.bc-segmented-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: var(--bc-border);
+  color: var(--bc-ink);
+}
+
+/* ============================================================
+   Grade Badge Styles (E5S1) — colorblind-safe: icon + text label
+   ============================================================ */
+
+.bc-grade-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--bc-chip-radius);
+  padding: 2px 8px;
+  font: 800 10px/1.4 var(--bc-font-family);
+  color: var(--bc-bg);
+}
+
+.bc-grade-perfect {
+  background: var(--bc-perfect);
+}
+
+.bc-grade-good {
+  background: var(--bc-good);
+}
+
+.bc-grade-late {
+  background: var(--bc-late);
+}
+
+.bc-grade-miss {
+  background: var(--bc-miss);
+}
+
+/* ============================================================
+   Notation Beam (E5S1)
+   ============================================================ */
+
+.bc-notation-beam {
+  height: 5px;
+  background: var(--bc-ink);
+  opacity: 0.85;
+  border-radius: 3px;
+}
+
+/* ============================================================
+   Active Slot (E5S1)
+   ============================================================ */
+
+.bc-active-slot {
+  outline: 4px solid var(--bc-primary);
+  outline-offset: 5px;
+  border-radius: var(--bc-notation-slot-radius);
+  transform: scale(1.04);
+  transition: transform 100ms ease-out;
+}
+
+/* ============================================================
+   Input Readiness Gate (E5S1)
+   ============================================================ */
+
+.bc-input-gate-idle {
+  border: 2px dashed var(--bc-late);
+}
+
+.bc-input-gate-ready {
+  border-color: var(--bc-primary);
+}
+
+/* ============================================================
+   Single-column Run Setup (E5S1)
+   ============================================================ */
+
+.bc-setup-panel {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* --- Hub tile (sticker panel card) --- */
+.bc-game-root__hub-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  background: #ffffff;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+  transform: rotate(0deg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+}
+
+.bc-game-root__hub-tile:hover {
+  transform: rotate(-1deg);
+  box-shadow: 6px 7px 0 rgba(0, 0, 0, 0.5);
+}
+
+.bc-game-root__hub-tile:active {
+  transform: rotate(1deg);
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* --- Thumbnail --- */
+.bc-game-root__hub-thumbnail {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background: #f1f5f9;
+}
+
+/* --- Title --- */
+.bc-game-root__hub-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+/* --- Summary line --- */
+.bc-game-root__hub-summary {
+  margin: 0;
+  font-size: 13px;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* --- Surface container --- */
+.bc-game-root__surface {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Loading state --- */
+.bc-game-root__loading {
+  padding: 32px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+/* ============================================================
+   Run Setup — single-column sticker panel
+   ============================================================ */
+
+.bc-game-root__run-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+  transform: rotate(0deg);
+}
+
+/* --- Label role (11px/700/0.1em) --- */
+.bc-game-root__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1e3a52;
+  margin-bottom: 4px;
+}
+
+/* ============================================================
+   Segmented Control
+   ============================================================ */
+
+.bc-game-root__segmented {
+  display: flex;
+  gap: 0;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.bc-game-root__segmented-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: #fdfeff;
+  color: #1e3a52;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  outline: none;
+}
+
+.bc-game-root__segmented-btn + .bc-game-root__segmented-btn {
+  border-left: 1px solid #e2e8f0;
+}
+
+.bc-game-root__segmented-btn--active {
+  background: #0ea5e9;
+  color: #1e3a52;
+  font-weight: 700;
+}
+
+.bc-game-root__segmented-btn:focus-visible {
+  outline: 3px solid #0ea5e9;
+  outline-offset: -3px;
+  z-index: 1;
+}
+
+.bc-game-root__segmented-btn:hover:not(.bc-game-root__segmented-btn--active):not(:disabled) {
+  background: #f1f5f9;
+}
+
+.bc-game-root__segmented-btn:disabled,
+.bc-game-root__segmented-btn--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: #e2e8f0;
+  color: #94a3b8;
+}
+
+/* --- Mode description note --- */
+.bc-game-root__mode-note {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: #64748b;
+  line-height: 1.5;
+  padding: 0 4px;
+}
+
+/* ============================================================
+   BPM Slider
+   ============================================================ */
+
+.bc-game-root__bpm-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bc-game-root__bpm-slider {
+  flex: 1;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e2e8f0;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.bc-game-root__bpm-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  border: 2px solid #f8fafc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.bc-game-root__bpm-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  border: 2px solid #f8fafc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.bc-game-root__bpm-slider:focus-visible {
+  outline: 3px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
+.bc-game-root__bpm-slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bc-game-root__bpm-value {
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: #1e3a52;
+  min-width: 60px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* --- Start button --- */
+.bc-game-root__start-btn {
+  display: block;
+  width: 100%;
+  padding: 12px 24px;
+  border: 4px solid #f8fafc;
+  border-radius: 12px;
+  background: #0ea5e9;
+  color: #1e3a52;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.bc-game-root__start-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.35);
+}
+
+.bc-game-root__start-btn:active {
+  transform: translateY(1px);
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.bc-game-root__start-btn:focus-visible {
+  outline: 3px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
+/* --- aria-live region (visually hidden) --- */
+.bc-game-root__aria-live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   Input Readiness Gate
+   ============================================================ */
+
+.bc-game-root__input-gate {
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+}
+
+.bc-game-root__gate-container {
+  margin-top: 8px;
+}
+
+.bc-game-root__gate-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bc-game-root__gate-dot {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px dashed #d8a03e;
+  background: #334155;
+  transition: background 0.3s ease, border-color 0.3s ease, border-style 0.3s ease;
+}
+
+.bc-game-root__gate-dot--idle {
+  border-color: #d8a03e;
+  border-style: dashed;
+  background: #334155;
+}
+
+.bc-game-root__gate-dot--live {
+  border-color: #0ea5e9;
+  border-style: solid;
+  background: #0ea5e9;
+  animation: bc-pulse 0.8s ease-in-out infinite alternate;
+}
+
+.bc-game-root__gate-dot--error {
+  border-color: #ef4444;
+  border-style: solid;
+  background: #ef4444;
+}
+
+@keyframes bc-pulse {
+  from {
+    box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+  }
+  to {
+    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0);
+  }
+}
+
+.bc-game-root__gate-message {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+  color: #64748b;
+  line-height: 1.5;
+  flex: 1;
+}
+
+/* ============================================================
+   Calibration Prompt
+   ============================================================ */
+
+.bc-game-root__calibration {
+  margin-top: 8px;
+}
+
+.bc-game-root__cal-prompt {
+  padding: 16px;
+  background: #ffffff;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+}
+
+.bc-game-root__cal-text {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.bc-game-root__cal-btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.bc-game-root__cal-btn {
+  flex: 1;
+  padding: 8px 16px;
+  border: 2px solid #f8fafc;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.bc-game-root__cal-btn--primary {
+  background: #0ea5e9;
+  color: #1e3a52;
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.bc-game-root__cal-btn--primary:active {
+  transform: translateY(1px);
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.bc-game-root__cal-btn--secondary {
+  background: #fdfeff;
+  color: #1e3a52;
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.bc-game-root__cal-btn--secondary:active {
+  transform: translateY(1px);
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* --- Calibration flow (mini-flow) --- */
+.bc-game-root__cal-flow {
+  padding: 16px;
+  background: #ffffff;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+
+.bc-game-root__cal-flow-status {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.bc-game-root__cal-paw {
+  display: inline-block;
+  font-size: 32px;
+  opacity: 0.3;
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+
+.bc-game-root__cal-paw--active {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* --- Calibration done --- */
+.bc-game-root__cal-done {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #0ea5e9;
+  text-align: center;
+}
+
+/* --- Calibration warning --- */
+.bc-game-root__cal-warning {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #d8a03e;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+  background: #ffffff;
+  text-align: center;
+}
+
+/* --- Disabled Start button --- */
+.bc-game-root__start-btn--disabled {
+  background: #334155 !important;
+  color: #94a3b8 !important;
+  box-shadow: none !important;
+  cursor: default !important;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* ============================================================
+   Cat Demo — bongo cat visual metronome (AD-7)
+   ============================================================ */
+
+.bc-game-root__cat-demo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px;
+  user-select: none;
+}
+
+/* --- State visibility --- */
+.bc-game-root__cat-demo--idle .bc-game-root__cat-demo-label,
+.bc-game-root__cat-demo--idle .bc-game-root__cat-demo-beat-count {
+  opacity: 0;
+}
+
+.bc-game-root__cat-demo--done .bc-game-root__cat-demo-paw--hit {
+  animation: none;
+}
+
+/* --- Label --- */
+.bc-game-root__cat-demo-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e3a52;
+  letter-spacing: 0.05em;
+  text-align: center;
+  min-height: 1.4em;
+  transition: opacity 0.2s ease;
+}
+
+/* --- Stage --- */
+.bc-game-root__cat-demo-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* --- Cat body --- */
+.bc-game-root__cat-demo-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* --- Head --- */
+.bc-game-root__cat-demo-head {
+  position: relative;
+  width: 100px;
+  height: 82px;
+  background: #fbbf24;
+  border-radius: 50% 50% 45% 45%;
+  border: 2px solid #d97706;
+}
+
+/* --- Ears --- */
+.bc-game-root__cat-demo-ear {
+  position: absolute;
+  width: 24px;
+  height: 22px;
+  background: #fbbf24;
+  border: 2px solid #d97706;
+  top: -12px;
+  z-index: -1;
+}
+
+.bc-game-root__cat-demo-ear--left {
+  left: 10px;
+  border-radius: 50% 0 0 0;
+  transform: rotate(-15deg);
+}
+
+.bc-game-root__cat-demo-ear--right {
+  right: 10px;
+  border-radius: 0 50% 0 0;
+  transform: rotate(15deg);
+}
+
+/* --- Face features --- */
+.bc-game-root__cat-demo-face {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  align-items: flex-start;
+  width: 60px;
+}
+
+.bc-game-root__cat-demo-eye {
+  width: 10px;
+  height: 12px;
+  background: #1e293b;
+  border-radius: 50%;
+}
+
+.bc-game-root__cat-demo-eyes-open .bc-game-root__cat-demo-eye {
+  height: 12px;
+}
+
+.bc-game-root__cat-demo-nose {
+  width: 8px;
+  height: 6px;
+  background: #f472b6;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  margin-top: 4px;
+  flex-basis: 100%;
+  text-align: center;
+}
+
+.bc-game-root__cat-demo-mouth {
+  width: 16px;
+  height: 8px;
+  border-bottom: 2px solid #92400e;
+  border-radius: 0 0 50% 50%;
+  flex-basis: 100%;
+  margin-top: 2px;
+}
+
+/* --- Paws --- */
+.bc-game-root__cat-demo-paws {
+  display: flex;
+  gap: 16px;
+  margin-top: -6px;
+}
+
+.bc-game-root__cat-demo-paw {
+  width: 28px;
+  height: 24px;
+  background: #fbbf24;
+  border: 2px solid #d97706;
+  border-radius: 40% 40% 50% 50%;
+  transition: transform 0.06s ease, background 0.06s ease;
+  position: relative;
+}
+
+/* Paw pads (claw marks) */
+.bc-game-root__cat-demo-paw::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 5px;
+  background: #fef3c7;
+  border-radius: 50%;
+  opacity: 0.5;
+}
+
+.bc-game-root__cat-demo-paw--hit {
+  transform: translateY(10px) scaleY(0.85);
+  background: #f59e0b;
+}
+
+/* --- Drums --- */
+.bc-game-root__cat-demo-drums {
+  display: flex;
+  gap: 16px;
+  margin-top: 2px;
+}
+
+.bc-game-root__cat-demo-drum {
+  width: 36px;
+  height: 20px;
+  background: #94a3b8;
+  border: 2px solid #64748b;
+  border-radius: 4px 4px 8px 8px;
+  position: relative;
+}
+
+.bc-game-root__cat-demo-drum::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  height: 5px;
+  background: #cbd5e1;
+  border: 2px solid #64748b;
+  border-radius: 3px;
+}
+
+.bc-game-root__cat-demo-drum--left {
+  transform: rotate(-2deg);
+}
+
+.bc-game-root__cat-demo-drum--right {
+  transform: rotate(2deg);
+}
+
+/* --- Beat count --- */
+.bc-game-root__cat-demo-beat-count {
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  min-width: 24px;
+  text-align: center;
+  transition: opacity 0.2s ease;
+}
+
+/* ============================================================
+   Cat Expressions — face reacting to Judge grades (task 3.2)
+   ============================================================ */
+
+.bc-game-root__cat-expressions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+/* --- Face display (emoji/text expression) --- */
+.bc-game-root__cat-expressions-face {
+  font-size: 28px;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  text-align: center;
+  transition: transform 0.15s ease, color 0.15s ease;
+  min-height: 1.4em;
+  min-width: 80px;
+}
+
+/* --- State-specific face styles --- */
+.bc-game-root__cat-expressions--idle .bc-game-root__cat-expressions-face {
+  color: #64748b;
+  transform: scale(1);
+}
+
+.bc-game-root__cat-expressions--focusing .bc-game-root__cat-expressions-face {
+  color: #1e3a52;
+  transform: scale(1.05);
+}
+
+.bc-game-root__cat-expressions--happy .bc-game-root__cat-expressions-face {
+  color: #16a34a;
+  transform: scale(1.15);
+}
+
+.bc-game-root__cat-expressions--good .bc-game-root__cat-expressions-face {
+  color: #0ea5e9;
+  transform: scale(1.08);
+}
+
+.bc-game-root__cat-expressions--sad .bc-game-root__cat-expressions-face {
+  color: #ef4444;
+  transform: scale(0.95);
+}
+
+/* --- Aria-live label (visually hidden) --- */
+.bc-game-root__cat-expressions-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ============================================================
+   Notation Strip — horizontal pattern visualisation (task 3.3)
+   ============================================================ */
+
+.bc-game-root__notation-strip {
+  position: relative;
+  width: 100%;
+  padding: 16px 12px;
+  user-select: none;
+  background: #ffffff;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+}
+
+.bc-game-root__notation-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Track (horizontal strip area) --- */
+.bc-game-root__notation-track {
+  position: relative;
+  height: 48px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* --- Slot blocks --- */
+.bc-game-root__notation-slot {
+  position: absolute;
+  top: 0;
+  height: 100%;
+}
+
+.bc-game-root__notation-slot--onset {
+  background: rgba(14, 165, 233, 0.08);
+}
+
+.bc-game-root__notation-slot--onset + .bc-game-root__notation-slot--onset {
+  border-left: 1px solid #e2e8f0;
+}
+
+.bc-game-root__notation-slot--rest {
+  background: transparent;
+}
+
+.bc-game-root__notation-slot--rest + .bc-game-root__notation-slot--rest {
+  border-left: 1px dashed #e2e8f0;
+}
+
+/* --- Onset dots --- */
+.bc-game-root__notation-onset-marker {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  border: 1.5px solid #0284c7;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* --- Beat indicator (vertical line) --- */
+.bc-game-root__notation-indicator {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 2px;
+  background: #ef4444;
+  z-index: 10;
+  pointer-events: none;
+  transition: left 0.08s linear;
+}
+
+.bc-game-root__notation-indicator::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #ef4444;
+}
+
+/* Hide indicator when idle or done */
+.bc-game-root__notation-strip--idle .bc-game-root__notation-indicator,
+.bc-game-root__notation-strip--done .bc-game-root__notation-indicator {
+  display: none;
+}
+
+/* --- Beat number label --- */
+.bc-game-root__notation-beat-label {
+  margin-top: 4px;
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: #94a3b8;
+  text-align: center;
+  min-height: 1.4em;
+}
+
+/* --- Hit feedback markers --- */
+.bc-game-root__notation-hit-marker {
+  position: absolute;
+  top: 50%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: bc-hit-pop 0.25s ease-out both;
+}
+
+.bc-game-root__notation-hit-marker--perfect {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
+  border: 1.5px solid #16a34a;
+}
+
+.bc-game-root__notation-hit-marker--good {
+  color: #d8a03e;
+  background: rgba(216, 160, 62, 0.12);
+  border: 1.5px solid #d8a03e;
+}
+
+.bc-game-root__notation-hit-marker--miss {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1.5px solid #ef4444;
+}
+
+.bc-game-root__notation-hit-marker--miss-extra {
+  color: #94a3b8;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1.5px dashed #94a3b8;
+  opacity: 0.7;
+}
+
+@keyframes bc-hit-pop {
+  from {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   HUD — Heads-Up Display (task 3.4)
+   ============================================================ */
+
+.bc-game-root__hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+  user-select: none;
+  position: relative;
+  min-height: 48px;
+}
+
+/* --- Shared label style --- */
+.bc-game-root__hud-label {
+  display: block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  line-height: 1;
+}
+
+/* --- Score --- */
+.bc-game-root__hud-score-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 72px;
+}
+
+.bc-game-root__hud-score {
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  transition: color 0.15s ease;
+}
+
+/* --- Lives --- */
+.bc-game-root__hud-lives-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 52px;
+}
+
+.bc-game-root__hud-lives {
+  display: inline-flex;
+  gap: 2px;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.bc-game-root__hud-heart {
+  color: #ef4444;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.bc-game-root__hud-heart--empty {
+  color: #cbd5e1;
+  opacity: 0.5;
+}
+
+/* --- Streak --- */
+.bc-game-root__hud-streak-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 36px;
+}
+
+.bc-game-root__hud-streak {
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0ea5e9;
+  line-height: 1.2;
+  transition: color 0.15s ease;
+}
+
+/* --- Grade badge --- */
+.bc-game-root__hud-grade {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 4px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  z-index: 20;
+  pointer-events: none;
+  animation: bc-grade-flash 0.3s ease-out both;
+}
+
+.bc-game-root__hud-grade--perfect {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.12);
+  border: 1.5px solid #16a34a;
+}
+
+.bc-game-root__hud-grade--good {
+  color: #d8a03e;
+  background: rgba(216, 160, 62, 0.12);
+  border: 1.5px solid #d8a03e;
+}
+
+.bc-game-root__hud-grade--miss {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1.5px solid #ef4444;
+}
+
+@keyframes bc-grade-flash {
+  from {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* --- Phase indicator --- */
+.bc-game-root__hud-phase-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 68px;
+}
+
+.bc-game-root__hud-phase {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e3a52;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* --- BPM --- */
+.bc-game-root__hud-bpm-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 52px;
+}
+
+.bc-game-root__hud-bpm {
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  line-height: 1.2;
+}
+
+/* ============================================================
+   Run Summary — end-of-run results panel (task 4.1)
+   ============================================================ */
+
+.bc-game-root__run-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  border: 4px solid #f8fafc;
+  border-radius: 18px;
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+  transform: rotate(0deg);
+}
+
+/* --- Title --- */
+.bc-game-root__summary-title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  text-align: center;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* --- Stat rows --- */
+.bc-game-root__summary-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+  min-height: 40px;
+}
+
+.bc-game-root__summary-stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.02em;
+}
+
+.bc-game-root__summary-stat-value {
+  font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: right;
+}
+
+/* --- Grade-specific colouring --- */
+.bc-game-root__summary-grade--s .bc-game-root__summary-stat-value {
+  color: #16a34a;
+}
+
+.bc-game-root__summary-grade--a .bc-game-root__summary-stat-value {
+  color: #0ea5e9;
+}
+
+.bc-game-root__summary-grade--b .bc-game-root__summary-stat-value {
+  color: #d8a03e;
+}
+
+.bc-game-root__summary-grade--c .bc-game-root__summary-stat-value {
+  color: #f97316;
+}
+
+.bc-game-root__summary-grade--d .bc-game-root__summary-stat-value {
+  color: #ef4444;
+}
+
+/* --- Button group --- */
+.bc-game-root__summary-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.bc-game-root__summary-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: 4px solid #f8fafc;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.bc-game-root__summary-btn:active {
+  transform: translateY(1px);
+}
+
+.bc-game-root__summary-btn:focus-visible {
+  outline: 3px solid #0ea5e9;
+  outline-offset: 2px;
+}
+
+.bc-game-root__summary-btn--primary {
+  background: #0ea5e9;
+  color: #1e3a52;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
+.bc-game-root__summary-btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.35);
+}
+
+.bc-game-root__summary-btn--primary:active {
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.bc-game-root__summary-btn--secondary {
+  background: #fdfeff;
+  color: #1e3a52;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.bc-game-root__summary-btn--secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.25);
+}
+
+.bc-game-root__summary-btn--secondary:active {
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* ── Run stage layout (run-controller.js scaffold) ─────────────────────── */
+.bc-game-root__stage {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.bc-game-root__stage-cat-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 24px;
+}
+
+.bc-game-root__stage-cat {
+  flex: 0 0 auto;
+}
+
+.bc-game-root__stage-expr {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.bc-game-root__stage-strip {
+  width: 100%;
+}
+
+.bc-game-root__stage-summary:empty {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Sticker Arcade v6 — gameplay stage per UX mockup
+   (docs/planning-artifacts/ux-designs/ux-BongoCat-2026-07-12/mockups/
+    gameplay-sticker-arcade.html). Sky Dusk palette, dark-first.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.bc-game-root__stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: #0F172A;
+  color: #F8FAFC;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  font-family: "Averia Libre", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  padding: 0;
+  gap: 0;
+}
+
+/* sticker base for stage children */
+.bc-game-root__stage .sticker-panel {
+  border: 3px solid #F8FAFC;
+  border-radius: 14px;
+  background: #1E293B;
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* ----- HUD row ----- */
+.bc-game-root__stage-hud {
+  flex-shrink: 0;
+  padding: 8px 12px 0;
+  z-index: 10;
+}
+.bc-game-root__stage-hud .bc-game-root__hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-lives-wrap {
+  display: flex; gap: 3px; padding: 5px 10px; transform: rotate(-1.2deg);
+  border: 3px solid #F8FAFC; border-radius: 14px; background: #1E293B;
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.45);
+  color: #EBA6BC; font-size: 14px;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-streak-wrap {
+  padding: 5px 14px; font-weight: 800; font-size: 14px; transform: rotate(1.5deg);
+  background: linear-gradient(90deg, #7DD3FC, #C3B1EC); color: #0F172A;
+  border: 3px solid #F8FAFC; border-radius: 999px;
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.45);
+}
+.bc-game-root__stage-hud .bc-game-root__hud-score-wrap {
+  padding: 5px 12px; font-weight: 800; font-size: 14px;
+  font-variant-numeric: tabular-nums; transform: rotate(-1deg);
+  border: 3px solid #F8FAFC; border-radius: 14px; background: #1E293B;
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* ----- Notation area ----- */
+.bc-game-root__stage-strip {
+  flex-shrink: 0;
+  margin: 6px 10px 8px;
+  z-index: 8;
+}
+.bc-game-root__notation-strip {
+  padding: 8px 10px 6px;
+  overflow: hidden;
+}
+.bc-game-root__notation-ribbon {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  align-items: start;
+  max-height: 240px;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bc-game-root__notation-ribbon { transition: none; }
+}
+@media (min-width: 900px) and (min-aspect-ratio: 13/8) {
+  .bc-game-root__notation-ribbon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.bc-game-root__notation-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 8px 10px 6px;
+  gap: 4px;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 2px solid rgba(248, 250, 252, 0.15);
+  min-height: 52px;
+  min-width: 0;
+}
+.bc-game-root__notation-bar--current {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(30, 41, 59, 0.8);
+}
+.bc-game-root__notation-bar--next {
+  opacity: 0.65;
+  border-color: rgba(51, 65, 85, 0.5);
+  background: rgba(30, 41, 59, 0.4);
+}
+.bc-game-root__notation-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex-basis: 0;
+  min-width: 36px;
+  position: relative;
+  padding: 4px 2px;
+  border-radius: 8px;
+}
+.bc-game-root__notation-slot--active {
+  outline: 3px solid #38BDF8;
+  outline-offset: 3px;
+  background: rgba(56, 189, 248, 0.1);
+}
+.bc-game-root__notation-figure {
+  height: 38px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  position: relative;
+  padding: 0 1px;
+}
+.bc-game-root__notation-label { position: absolute; left: -9999px; }
+.bc-game-root__notation-runline {
+  text-align: center;
+  font-size: 10px;
+  color: #8FA0B8;
+  padding: 3px 0 0;
+}
+
+/* Grade badges */
+.bc-game-root__grade {
+  font-size: 8px; font-weight: 800; border-radius: 999px; padding: 2px 6px;
+  color: #0F172A; white-space: nowrap;
+  border: 2px solid #F8FAFC; box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+}
+.bc-game-root__grade small { font-weight: 500; font-size: 7px; }
+.bc-game-root__grade--perfect { background: #6FC9A2; }
+.bc-game-root__grade--good { background: #9BA8F0; }
+.bc-game-root__grade--late { background: #E7B95F; }
+.bc-game-root__grade--miss { background: #E092A4; }
+.bc-game-root__grade--wait {
+  border: 2px dashed #334155; box-shadow: none; background: none; color: #64748B;
+}
+
+/* ----- Cat zone (bottom, no desk) ----- */
+.bc-game-root__stage-cat {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 0;
+}
+.bc-game-root__cat-demo {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  position: relative;
+}
+.bc-game-root__cat-zone {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+.bc-game-root__cat {
+  position: relative;
+  width: min(34vw, 260px);
+  aspect-ratio: 727 / 365;
+  z-index: 1;
+}
+.bc-game-root__cat-sprite {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.bc-game-root__cat-demo-label {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 700;
+  font-size: 13px;
+  color: #7DD3FC;
+  z-index: 6;
+}
+.bc-game-root__cat-demo-beat-count {
+  position: absolute;
+  bottom: 6px;
+  left: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #8FA0B8;
+  z-index: 6;
+}
+
+/* ----- Instrument (in front of cat, between the paws) ----- */
+.bc-game-root__instrument {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 6px;
+  transition: transform 0.08s ease;
+}
+.bc-game-root__instrument--hit { transform: translateX(-50%) translateY(2px) scale(0.96); }
+.bc-game-root__instrument-sprite {
+  display: block;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* CSS fallback instruments (mockup shapes) */
+.bc-game-root__instrument-css--drums { display: flex; gap: 6px; align-items: flex-end; }
+.bc-game-root__instr-bongo {
+  width: 44px; height: 36px; border-radius: 50% 50% 8px 8px;
+  background: #38BDF8; border: 3px solid #F8FAFC;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.45);
+  position: relative;
+}
+.bc-game-root__instr-bongo::before {
+  content: ""; position: absolute; top: 3px; left: 4px; right: 4px; height: 12px;
+  border-radius: 50%; background: #7DD3FC;
+}
+.bc-game-root__instr-bongo--left { height: 40px; }
+.bc-game-root__instr-bongo--right { height: 32px; }
+
+.bc-game-root__instrument-css--piano { display: flex; gap: 2px; align-items: flex-start; }
+.bc-game-root__instr-key {
+  width: 18px; height: 44px; border-radius: 4px 4px 2px 2px;
+  background: #F8FAFC; border: 2px solid #0F172A;
+  box-shadow: 2px 3px 0 rgba(0, 0, 0, 0.4);
+}
+.bc-game-root__instr-key--flat {
+  width: 12px; height: 28px; margin: 0 -7px; z-index: 2;
+  background: #0F172A; border: 1px solid #F8FAFC;
+}
+
+.bc-game-root__instrument-css--guitar { position: relative; width: 80px; height: 60px; }
+.bc-game-root__instr-guitar-body {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 56px; height: 40px; border-radius: 50% 50% 40% 40%;
+  background: #E0A9CB; border: 3px solid #F8FAFC;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.45);
+}
+.bc-game-root__instr-guitar-neck {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 10px; height: 28px; background: #1E293B;
+  border: 2px solid #F8FAFC; border-radius: 2px;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+}
+.bc-game-root__instr-guitar-strings {
+  position: absolute; top: 2px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 24px;
+  border-left: 1px solid rgba(248, 250, 252, 0.5);
+  border-right: 1px solid rgba(248, 250, 252, 0.5);
+}
+
+/* Summary overlays the stage */
+.bc-game-root__stage-summary {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  pointer-events: none;
+}
+.bc-game-root__stage-summary > * { pointer-events: auto; }
+.bc-game-root__stage-summary:empty { display: none; }
+
+/* Light mode (host/OS signal) */
+@media (prefers-color-scheme: light) {
+  .bc-game-root__stage { background: #E8F4FC; color: #1E3A52; }
+  .bc-game-root__stage .sticker-panel,
+  .bc-game-root__stage-hud .bc-game-root__hud-lives-wrap,
+  .bc-game-root__stage-hud .bc-game-root__hud-score-wrap {
+    background: #FDFEFF; border-color: #F8FAFC;
+  }
+  .bc-game-root__notation-runline { color: #5A7591; }
+}
+
+/* ── Averia Libre (SIL OFL) — drop TTF files into assets/fonts/ ────────
+   Relative URLs resolve against this stylesheet''s /assets/ route, so the
+   font serves through the sandboxed plugin asset route. Until the files
+   exist the rules 404 harmlessly and the ui-rounded fallback stack holds. */
+@font-face {
+  font-family: "Averia Libre";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/AveriaLibre-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Averia Libre";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/AveriaLibre-Bold.ttf") format("truetype");
+}
+
+
+/* ── v6 fixes: centering, container-responsive ribbon, SVG figures ────── */
+
+/* Center the stage: the root and surface must span the host container so
+   the stage''s margin:auto has room to work. */
+.bc-game-root { display: block; width: 100%; }
+.bc-game-root__surface { display: block; width: 100%; }
+
+/* The stage is a size container so the notation ribbon can respond to the
+   stage''s own width (not the viewport''s). */
+.bc-game-root__stage { container-type: inline-size; }
+
+/* Ribbon: 1 column by default, 2 / 3 / 4 columns as stage width allows.
+   Bars beyond the first row are hidden by the max-height clip. */
+.bc-game-root__notation-ribbon { grid-auto-rows: min-content; }
+@container (min-width: 640px) {
+  .bc-game-root__notation-ribbon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container (min-width: 960px) {
+  .bc-game-root__notation-ribbon { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container (min-width: 1280px) {
+  .bc-game-root__notation-ribbon { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* SVG figures: ink color, bottom-aligned inside the figure box. */
+.bc-game-root__notation-figure { color: #F8FAFC; }
+.bc-game-root__notation-figure svg { display: block; }
+.bc-game-root__fig-triplet-label { fill: #7DD3FC; }
+@media (prefers-color-scheme: light) {
+  .bc-game-root__notation-figure { color: #1E3A52; }
+  .bc-game-root__fig-triplet-label { fill: #0EA5E9; }
+}
+
+/* Calibration overlay (pre-run tap-along phase) */
+.bc-game-root__calibration-overlay {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1deg);
+  z-index: 15;
+  max-width: 420px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  color: #F8FAFC;
+}
+@media (prefers-color-scheme: light) {
+  .bc-game-root__calibration-overlay { color: #1E3A52; }
+}
+
+/* Count-in overlay (universal 4-3-2-1) */
+.bc-game-root__countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+  pointer-events: none;
+  font-size: clamp(64px, 18vw, 160px);
+  font-weight: 800;
+  color: #7DD3FC;
+  text-shadow: 5px 6px 0 rgba(0, 0, 0, 0.45);
+}
+@media (prefers-color-scheme: light) {
+  .bc-game-root__countdown { color: #0EA5E9; }
+}
+
+/* Graded past bars: dimmed but keep their badges until the row pages away.
+   The ribbon transition (bouncy cubic-bezier, defined on the ribbon) drives
+   the row scroll-up when the current bar leaves the first row. */
+.bc-game-root__notation-bar--past {
+  opacity: 0.35;
+  border-color: rgba(51, 65, 85, 0.5);
+  background: rgba(30, 41, 59, 0.35);
+}
+
+/* Ribbon viewport: JS clamps this to exactly two rows so a third row can
+   never spill over the cat zone; the ribbon transform pages rows through it. */
+.bc-game-root__notation-viewport {
+  overflow: hidden;
+}
+.bc-game-root__notation-viewport .bc-game-root__notation-ribbon {
+  max-height: none;
+}
+
+/* ── Stacked 800×800 sprite layers ───────────────────────────────────────
+   Cat and instrument art share one square canvas and register at the same
+   position: instrument layer below, cat layer (paws) on top. Both fill
+   the cat box; identical object-fit keeps them pixel-registered when the
+   box is squeezed by the stage height. */
+.bc-game-root__cat {
+  aspect-ratio: 1 / 1;
+  max-height: 100%;
+}
+.bc-game-root__cat-sprite {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  z-index: 2;
+}
+.bc-game-root__instrument {
+  position: absolute;
+  inset: 0;
+  transform: none;
+  z-index: 1;
+}
+.bc-game-root__instrument--hit {
+  transform: translateY(2px) scale(0.98);
+  transform-origin: bottom center;
+}
+.bc-game-root__instrument-sprite {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+}
+/* CSS fallback instruments (no sprite file) sit centered at the bottom of
+   the same box. */
+.bc-game-root__instrument-css {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Phase ("Learning"/"Challenge") and BPM chips — same sticker language as
+   the hearts/streak/score row. */
+.bc-game-root__stage-hud .bc-game-root__hud-phase-wrap,
+.bc-game-root__stage-hud .bc-game-root__hud-bpm-wrap {
+  padding: 5px 12px;
+  font-weight: 700;
+  font-size: 12px;
+  border: 3px solid #F8FAFC;
+  border-radius: 999px;
+  background: #1E293B;
+  color: #F8FAFC;
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.45);
+}
+.bc-game-root__stage-hud .bc-game-root__hud-phase-wrap { transform: rotate(1deg); }
+.bc-game-root__stage-hud .bc-game-root__hud-bpm-wrap { transform: rotate(-1.4deg); }
+@media (prefers-color-scheme: light) {
+  .bc-game-root__stage-hud .bc-game-root__hud-phase-wrap,
+  .bc-game-root__stage-hud .bc-game-root__hud-bpm-wrap {
+    background: #FDFEFF;
+    color: #1E3A52;
+  }
+}
+
+/* Fixes: the strip wrapper had width:100% PLUS side margins, pushing the
+   sticker's right border past the stage clip; and the legacy full-width
+   HUD panel still cast its sticker shadow across the top row. */
+.bc-game-root__stage-strip {
+  width: auto;
+}
+.bc-game-root__stage-hud .bc-game-root__hud {
+  box-shadow: none;
+}
+
+/* Phase cue ("Listen…" / "Your turn!") — promoted to a headline size. */
+.bc-game-root__cat-demo-label {
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 800;
+}
+
+/* ── HUD chip typography — dark-mode readable ────────────────────────────
+   The legacy component CSS hardcodes light-panel ink (#0f172a / #94a3b8)
+   inside the chips; on the dark sticker fills that is unreadable. Scope
+   Sky Dusk ink onto everything inside the stage HUD. The streak chip
+   keeps dark text — its gradient fill is light in both modes. */
+.bc-game-root__stage-hud .bc-game-root__hud-score,
+.bc-game-root__stage-hud .bc-game-root__hud-phase,
+.bc-game-root__stage-hud .bc-game-root__hud-bpm {
+  color: #F8FAFC;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-label {
+  color: #B9C4D6;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-streak,
+.bc-game-root__stage-hud .bc-game-root__hud-streak-wrap .bc-game-root__hud-label {
+  color: #0F172A;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-heart {
+  color: #EBA6BC;
+}
+.bc-game-root__stage-hud .bc-game-root__hud-heart--empty {
+  color: #EBA6BC;
+  opacity: 0.3;
+}
+@media (prefers-color-scheme: light) {
+  .bc-game-root__stage-hud .bc-game-root__hud-score,
+  .bc-game-root__stage-hud .bc-game-root__hud-phase,
+  .bc-game-root__stage-hud .bc-game-root__hud-bpm {
+    color: #1E3A52;
+  }
+  .bc-game-root__stage-hud .bc-game-root__hud-label {
+    color: #5A7591;
+  }
+  .bc-game-root__stage-hud .bc-game-root__hud-heart {
+    color: #E08CA4;
+  }
+  .bc-game-root__stage-hud .bc-game-root__hud-heart--empty {
+    color: #E08CA4;
+    opacity: 0.3;
+  }
+}

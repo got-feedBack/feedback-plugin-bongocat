@@ -1,0 +1,44 @@
+{
+  "id": "feedback-plugin-bongocat",
+  "name": "Bongo Cat's Rhythm Trainer",
+  "version": "0.1.0",
+  "private": true,
+  "script": "game.js",
+  "minigame": {
+    "title": "Bongo Cat's Rhythm Trainer",
+    "tagline": "Tap along with Bongo Cat",
+    "type": "chart-free",
+    "scoring": "discrete",
+    "thumbnail": "thumbnail.png",
+    "modifiers": [
+      {
+        "id": "instrument",
+        "label": "Instrument",
+        "default": "guitar",
+        "values": ["guitar", "piano", "drums"]
+      },
+      {
+        "id": "mode",
+        "label": "Mode",
+        "default": "learning",
+        "values": ["learning", "challenge"]
+      },
+      {
+        "id": "tempo",
+        "label": "Tempo (BPM)",
+        "default": "80",
+        "values": ["60", "80", "100", "120", "140", "160"]
+      },
+      {
+        "id": "calibration",
+        "label": "Calibration",
+        "default": "auto",
+        "values": ["auto", "on", "off"]
+      }
+    ],
+    "tracks_dir": "tracks"
+  },
+  "routes": "routes.py",
+  "styles": "assets/styles.css",
+  "category": "game"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "feedback-plugin-bongocat",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "vitest --run",
+    "lint": "echo ok"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1",
+    "vitest": "^3.0"
+  }
+}
