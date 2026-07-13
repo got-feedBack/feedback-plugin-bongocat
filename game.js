@@ -63,6 +63,9 @@
     };
   }
 
+  // Exposed for tests only — not part of the SDK surface.
+  window.feedBackMinigamesBongoCatTest = { configFromModifiers: configFromModifiers };
+
   var controller = null;
 
   function startRun(container, config, sdk) {
