@@ -52,13 +52,19 @@
   function configFromModifiers(modifiers) {
     modifiers = modifiers || {};
     var bpm = parseInt(modifiers.tempo, 10);
+    // "guitar/bass" is the user-facing modifier value; internally both are
+    // handled by the guitar (notedetect) input path.
+    var instrument = modifiers.instrument === "guitar/bass" ? "guitar" : modifiers.instrument;
     return {
-      instrument: modifiers.instrument || "guitar",
+      instrument: instrument || "guitar",
       mode: modifiers.mode || "learning",
       bpm: isNaN(bpm) ? 80 : bpm,
       calibration: modifiers.calibration || "auto",
     };
   }
+
+  // Exposed for tests only — not part of the SDK surface.
+  window.feedBackMinigamesBongoCatTest = { configFromModifiers: configFromModifiers };
 
   var controller = null;
 
@@ -81,7 +87,7 @@
     // Mirrored in plugin.json's minigame block; the manifest copy takes
     // precedence in the host's modifier picker.
     modifiers: [
-      { id: "instrument", label: "Instrument", default: "guitar", values: ["guitar", "piano", "drums"] },
+      { id: "instrument", label: "Instrument", default: "guitar/bass", values: ["guitar/bass", "piano", "drums"] },
       { id: "mode", label: "Mode", default: "learning", values: ["learning", "challenge"] },
       { id: "tempo", label: "Tempo (BPM)", default: "80", values: ["60", "80", "100", "120", "140", "160"] },
       { id: "calibration", label: "Calibration", default: "auto", values: ["auto", "on", "off"] },
