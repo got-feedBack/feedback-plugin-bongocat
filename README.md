@@ -1,7 +1,8 @@
 # Bongo Cat's Rhythm Trainer
 
 A feedBack minigame plugin for practicing rhythms on your real instrument — guitar, bass, piano, or drums. Bongo Cat demos a rhythm pattern in time with the metronome, then you play it back; your hits are picked up through feedBack's note detection and judged against the beat.
-<img width="1166" height="629" alt="grafik" src="https://github.com/user-attachments/assets/3807530b-d7e3-4593-8804-e206df014b2d" />
+<img width="1093" height="735" alt="grafik" src="https://github.com/user-attachments/assets/f30874f7-4927-43ea-9cbf-86783d1454e8" />
+
 
 ## How it works
 
