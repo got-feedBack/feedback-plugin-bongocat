@@ -14,9 +14,9 @@ A feedBack minigame plugin for practicing rhythms on your real instrument — gu
 
 | Modifier | Values | Default |
 |---|---|---|
-| Instrument | guitar, piano, drums | guitar |
+| Instrument | guitar/bass, piano, drums | guitar/bass |
 | Mode | learning, challenge | learning |
-| Tempo (BPM) | 60–160 in steps | 80 |
+| Tempo (BPM) | 60–160 in 20 BPM steps | 80 |
 | Calibration | auto, on, off | auto |
 
 ## Structure

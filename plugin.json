@@ -14,8 +14,8 @@
       {
         "id": "instrument",
         "label": "Instrument",
-        "default": "guitar",
-        "values": ["guitar", "piano", "drums"]
+        "default": "guitar/bass",
+        "values": ["guitar/bass", "piano", "drums"]
       },
       {
         "id": "mode",
