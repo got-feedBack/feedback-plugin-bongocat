@@ -669,11 +669,26 @@
     var env = 0;                // decaying energy envelope
     var lastOnsetT = 0;
     var stopped = false;
-    this._energyStop = function () { stopped = true; };
+    var holdsCaptureDemand = false;
+    this._energyStop = function () {
+      stopped = true;
+      if (holdsCaptureDemand) {
+        holdsCaptureDemand = false;
+        try { audio.leases.releaseDemand("capture", "bongocat"); } catch (_) {}
+      }
+    };
 
-    // Make sure the engine is capturing (same best-effort dance as the SDK).
+    // Make sure the engine is capturing. Preferred: the desktop lease
+    // registry's refcounted 'capture' demand (ownership plan 6.1) — the
+    // engine runs while any holder needs it, released on stop/death, no
+    // start-then-undo bookkeeping. Legacy raw start on old desktop mains.
     Promise.resolve()
       .then(function () {
+        if (audio.leases && typeof audio.leases.acquireDemand === "function") {
+          return audio.leases.acquireDemand("capture", "bongocat").then(function () {
+            holdsCaptureDemand = true;
+          });
+        }
         if (typeof audio.isAudioRunning === "function") {
           return audio.isAudioRunning().then(function (running) {
             if (!running && typeof audio.startAudio === "function") {
