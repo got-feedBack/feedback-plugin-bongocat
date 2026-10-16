@@ -4,6 +4,16 @@ A feedBack minigame plugin for practicing rhythms on your real instrument — gu
 <img width="1093" height="735" alt="grafik" src="https://github.com/user-attachments/assets/f30874f7-4927-43ea-9cbf-86783d1454e8" />
 
 
+## Installation
+
+```bash
+cd /path/to/feedBack/plugins
+git clone https://github.com/got-feedBack/feedback-plugin-bongocat.git
+docker compose restart
+```
+
+Hits are read through the [Note Detect](https://github.com/got-feedBack/feedBack-plugin-notedetect) plugin, version 1.10.0 or newer.
+
 ## How it works
 
 - Pick an instrument, mode, and tempo from the minigame modifiers.

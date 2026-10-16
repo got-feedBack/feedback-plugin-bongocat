@@ -40,5 +40,7 @@
   },
   "routes": "routes.py",
   "styles": "assets/styles.css",
-  "category": "game"
+  "category": "game",
+  "description": "Rhythm trainer minigame. Bongo Cat plays a pattern, then you play it back on your instrument.",
+  "icon": "assets/thumbnail.png"
 }
